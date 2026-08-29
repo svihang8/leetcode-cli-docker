@@ -1,0 +1,18 @@
+[code]
+# Prepend the problem description as a comment
+comment_problem_desc = true
+# "true" exits immediately; the zsh wrapper then opens the file in Cursor.
+editor = "true"
+test = true
+lang = "python3"
+comment_leading = "#"
+
+[cookies]
+csrf = ""
+session = ""
+site = "leetcode.com"
+
+[storage]
+code = "code"
+root = "~/.leetcode"
+scripts = "scripts"

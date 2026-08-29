@@ -1,0 +1,6 @@
+# CLI data: cache, generated solutions. Keep leetcode.toml commitable.
+.leetcode/*
+!.leetcode/leetcode.toml
+
+# Session cookies (LEETCODE_CSRF / LEETCODE_SESSION)
+.env

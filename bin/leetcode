@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# Run leetcode-cli in Docker. Lives next to the Dockerfile; add this dir's
+# parent bin/ to PATH (dotfiles 00-exports.zsh) to call it as `leetcode`.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+IMAGE="${LEETCODE_CLI_IMAGE:-leetcode-cli}"
+CODE_DIR="$ROOT/.leetcode/code"
+
+if ! command -v docker >/dev/null 2>&1; then
+  echo "leetcode: docker is required" >&2
+  exit 1
+fi
+
+if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
+  if [[ ! -f "$ROOT/Dockerfile" ]]; then
+    echo "leetcode: image '$IMAGE' not found and no Dockerfile at $ROOT" >&2
+    exit 1
+  fi
+  docker build -t "$IMAGE" "$ROOT"
+fi
+
+mkdir -p "$ROOT/.leetcode"
+
+if [[ ! -r "$ROOT/.env" ]]; then
+  echo "leetcode: missing $ROOT/.env (copy from .env.example)" >&2
+  exit 1
+fi
+
+is_edit=0
+[[ "${1:-}" == "edit" || "${1:-}" == "e" ]] && is_edit=1
+
+# csrf/session in gitignored .env; site in leetcode.toml.
+# Do not pass empty -e LEETCODE_* — that would override --env-file with blanks.
+docker run --rm -it \
+  -v "$ROOT/.leetcode:/root/.leetcode" \
+  --env-file "$ROOT/.env" \
+  "$IMAGE" "$@"
+
+if [[ "$is_edit" -eq 1 ]]; then
+  id=""
+  for arg in "$@"; do
+    [[ "$arg" =~ ^[0-9]+$ ]] && id="$arg"
+  done
+
+  file=""
+  if [[ -n "$id" ]]; then
+    for candidate in "$CODE_DIR/$id".*.py; do
+      [[ -f "$candidate" ]] || continue
+      file="$candidate"
+      break
+    done
+  else
+    file="$(ls -t "$CODE_DIR"/*.py 2>/dev/null | head -1 || true)"
+  fi
+
+  if [[ -z "$file" || ! -f "$file" ]]; then
+    echo "leetcode: no solution .py under $CODE_DIR to open" >&2
+    exit 1
+  fi
+
+  if command -v cursor >/dev/null 2>&1; then
+    cursor "$file"
+  else
+    open -a Cursor "$file"
+  fi
+fi

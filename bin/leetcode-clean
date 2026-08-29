@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Delete generated solutions under .leetcode/code/. Keeps leetcode.toml,
+# cookies (.env), and the problem cache.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+CODE_DIR="$ROOT/.leetcode/code"
+
+if [[ ! -d "$CODE_DIR" ]]; then
+  echo "leetcode-clean: nothing to remove ($CODE_DIR)" >&2
+  exit 0
+fi
+
+rm -rf -- "$CODE_DIR"
+mkdir -p -- "$CODE_DIR"
