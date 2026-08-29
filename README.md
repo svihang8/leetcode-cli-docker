@@ -25,6 +25,7 @@ leetcode pick 1
 leetcode edit 1    # writes a Python file, then opens it in Cursor
 leetcode test 1
 leetcode-clean     # delete generated files under .leetcode/code/
+leetcode-env       # leetcode-env --csrf=PASTE --session=PASTE
 ```
 
 Override the image name with `LEETCODE_CLI_IMAGE` (default `leetcode-cli`).
@@ -37,7 +38,7 @@ committed:
 
 - `.leetcode/leetcode.toml` — CLI config (`lang` is `python3`; `site` is `leetcode.com`; `editor` is `true` so the container does not open vim). Leave `csrf` and `session` empty.
 - `.leetcode/code/` — generated solution files (`leetcode edit` opens these in Cursor)
-- `.env` — cookies only (gitignored). Copy `.env.example` and fill in `LEETCODE_CSRF` and `LEETCODE_SESSION`.
+- `.env` — cookies only (gitignored). Run `leetcode-env` or copy `.env.example`.
 
 ## Cookies
 

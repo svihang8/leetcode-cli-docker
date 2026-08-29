@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+usage() { echo "usage: leetcode-env --csrf=... --session=..." >&2; exit 1; }
+
+csrf=""
+session=""
+got_csrf=0
+got_session=0
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --csrf=*)
+      csrf="${1#--csrf=}"
+      got_csrf=1
+      shift
+      if [[ -z "$csrf" && $# -gt 0 && "$1" != --* ]]; then csrf="$1"; shift; fi
+      ;;
+    --csrf)
+      [[ $# -ge 2 ]] || usage
+      csrf="$2"
+      got_csrf=1
+      shift 2
+      ;;
+    --session=*)
+      session="${1#--session=}"
+      got_session=1
+      shift
+      if [[ -z "$session" && $# -gt 0 && "$1" != --* ]]; then session="$1"; shift; fi
+      ;;
+    --session)
+      [[ $# -ge 2 ]] || usage
+      session="$2"
+      got_session=1
+      shift 2
+      ;;
+    *) usage ;;
+  esac
+done
+
+[[ "$got_csrf" -eq 1 && "$got_session" -eq 1 ]] || usage
+
+umask 077
+printf 'LEETCODE_CSRF=%s\nLEETCODE_SESSION=%s\n' "$csrf" "$session" > "$ROOT/.env"
